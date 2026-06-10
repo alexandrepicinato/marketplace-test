@@ -327,6 +327,7 @@
 
         @auth
             <a href="{{ route('dashboard') }}">Dashboard</a>
+            <a href="{{ route('purchases.index') }}">Minhas Compras</a>
             <a href="{{ route('products.index') }}">Produtos</a>
             <a href="{{ route('affiliates.index') }}">Afiliar-se</a>
             <a href="{{ route('affiliates.my') }}">Minhas Afiliações</a>

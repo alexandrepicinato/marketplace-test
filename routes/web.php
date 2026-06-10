@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductPageController;
 use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PurchaseController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -68,7 +69,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
         Route::get('/usuarios', [AdminController::class, 'users'])->name('users');
-
+        Route::get('/minhas-compras', [PurchaseController::class, 'index'])->name('purchases.index');
+        Route::get('/minhas-compras/{order}', [PurchaseController::class, 'show'])->name('purchases.show');
         Route::get('/produtos', [AdminController::class, 'products'])->name('products');
         Route::patch('/produtos/{product}/aprovacao', [AdminController::class, 'updateProductApproval'])->name('products.approval');
         Route::patch('/produtos/{product}/desativar', [AdminController::class, 'disableProduct'])->name('products.disable');
