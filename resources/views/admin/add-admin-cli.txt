@@ -1,0 +1,10 @@
+
+
+Depois de rodar as migrations, crie um usuário normal pela tela /register.
+php artisan tinker
+$user = App\Models\User::where('email', 'SEU_EMAIL_AQUI')->first();
+$user->is_admin = true;
+$user->save();
+
+
+$user = App\Models\User::where('email', 'user@user.com')->first();
