@@ -42,7 +42,9 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/produtos/imagens/{image}', [ProductController::class, 'destroyImage'])
         ->name('products.images.destroy');
-
+    Route::get('/minhas-compras', [PurchaseController::class, 'index'])->name('purchases.index');
+        Route::get('/minhas-compras/{order}', [PurchaseController::class, 'show'])->name('purchases.show');
+        
     Route::get('/afiliados/produtos', [AffiliateController::class, 'index'])->name('affiliates.index');
     Route::post('/afiliados/produtos/{product}', [AffiliateController::class, 'store'])->name('affiliates.store');
 
@@ -69,8 +71,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
         Route::get('/usuarios', [AdminController::class, 'users'])->name('users');
-        Route::get('/minhas-compras', [PurchaseController::class, 'index'])->name('purchases.index');
-        Route::get('/minhas-compras/{order}', [PurchaseController::class, 'show'])->name('purchases.show');
+        
+        
         Route::get('/produtos', [AdminController::class, 'products'])->name('products');
         Route::patch('/produtos/{product}/aprovacao', [AdminController::class, 'updateProductApproval'])->name('products.approval');
         Route::patch('/produtos/{product}/desativar', [AdminController::class, 'disableProduct'])->name('products.disable');
