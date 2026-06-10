@@ -52,6 +52,39 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
+            $user = auth()->user();
+
+            if ($user->isBlocked()) {
+                Auth::logout();
+
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                $message = 'Sua conta está bloqueada.';
+
+                if ($user->account_status === 'inactive') {
+                    $message = 'Sua conta está desativada.';
+                }
+
+                if ($user->account_status === 'suspended') {
+                    $message = 'Sua conta está suspensa.';
+
+                    if ($user->suspended_until) {
+                        $message .= ' Até: ' . $user->suspended_until->format('d/m/Y H:i');
+                    }
+
+                    if ($user->suspension_reason) {
+                        $message .= ' Motivo: ' . $user->suspension_reason;
+                    }
+                }
+
+                return redirect()
+                    ->route('login')
+                    ->withErrors([
+                        'email' => $message,
+                    ]);
+            }
+
             return redirect()->intended(route('dashboard'));
         }
 

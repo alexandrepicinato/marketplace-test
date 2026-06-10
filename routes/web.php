@@ -10,6 +10,8 @@ use App\Http\Controllers\ProductPageController;
 use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\AffiliateEarningController;
+use App\Http\Controllers\SaleController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -39,6 +41,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/produtos/{product}/editar', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/produtos/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/produtos/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+
+    Route::get('/afiliados/ganhos', [AffiliateEarningController::class, 'index'])
+    ->name('affiliate.earnings.index');
+
+
+    Route::get('/minhas-vendas', [SaleController::class, 'index'])->name('sales.index');
+    Route::get('/minhas-vendas/{order}', [SaleController::class, 'show'])->name('sales.show');
+
 
     Route::delete('/produtos/imagens/{image}', [ProductController::class, 'destroyImage'])
         ->name('products.images.destroy');
@@ -72,6 +83,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/usuarios', [AdminController::class, 'users'])->name('users');
         
+
+
         
         Route::get('/produtos', [AdminController::class, 'products'])->name('products');
         Route::patch('/produtos/{product}/aprovacao', [AdminController::class, 'updateProductApproval'])->name('products.approval');
@@ -87,6 +100,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/configuracoes', [AdminController::class, 'settings'])->name('settings');
         Route::post('/configuracoes', [AdminController::class, 'updateSettings'])->name('settings.update');
 
+
+        Route::get('/afiliados/ganhos', [AdminController::class, 'affiliateEarnings'])
+            ->name('affiliate.earnings');
+
+        Route::patch('/afiliados/ganhos/{order}/validar', [AdminController::class, 'updateAffiliateCommission'])
+            ->name('affiliate.earnings.update');
+
+        Route::patch('/usuarios/{user}/status', [AdminController::class, 'updateUserStatus'])
+            ->name('users.status');
+
+            
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
     });
 });

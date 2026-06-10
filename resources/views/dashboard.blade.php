@@ -22,6 +22,7 @@
             <a href="{{ route('products.create') }}" class="btn btn-primary">Cadastrar produto</a>
             <a href="{{ route('affiliates.index') }}" class="btn btn-secondary">Afiliar-se</a>
             <a href="{{ route('affiliates.my') }}" class="btn btn-secondary">Minhas afiliações</a>
+            <a href="{{ route('sales.index') }}" class="btn btn-secondary">Minhas vendas</a>
         </div>
     </div>
 

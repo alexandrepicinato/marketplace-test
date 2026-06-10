@@ -41,6 +41,9 @@
         <div class="card">
             <h3>Afiliações ativas</h3>
             <div class="price">{{ $stats['affiliations'] }}</div>
+                <a href="{{ route('admin.affiliate.earnings') }}" class="btn btn-secondary">
+                    Ganhos de afiliados
+                </a>
         </div>
 
         <div class="card">

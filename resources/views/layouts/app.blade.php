@@ -327,11 +327,12 @@
 
         @auth
             <a href="{{ route('dashboard') }}">Dashboard</a>
+            <a href="{{ route('sales.index') }}">Minhas Vendas</a>
             <a href="{{ route('purchases.index') }}">Minhas Compras</a>
             <a href="{{ route('products.index') }}">Produtos</a>
             <a href="{{ route('affiliates.index') }}">Afiliar-se</a>
             <a href="{{ route('affiliates.my') }}">Minhas Afiliações</a>
-
+            <a href="{{ route('affiliate.earnings.index') }}">Vendas Afiliados </a>
             @if (auth()->user()->is_admin)
                 <a href="{{ route('admin.dashboard') }}" class="admin-link">
                     Admin

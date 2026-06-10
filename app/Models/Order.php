@@ -20,6 +20,11 @@ class Order extends Model
         'subtotal',
         'commission_percentage',
         'commission_amount',
+        'commission_status',
+        'commission_validated_at',
+        'commission_validated_by',
+        'commission_notes',
+        'commission_paid_at',
         'status',
         'tracking_code',
         'tracking_carrier',
@@ -31,6 +36,8 @@ class Order extends Model
 
     protected $casts = [
         'deleted_at' => 'datetime',
+        'commission_validated_at' => 'datetime',
+        'commission_paid_at' => 'datetime',
     ];
 
     public function buyer(): BelongsTo
@@ -46,6 +53,11 @@ class Order extends Model
     public function affiliate(): BelongsTo
     {
         return $this->belongsTo(User::class, 'affiliate_user_id');
+    }
+
+    public function commissionValidator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'commission_validated_by');
     }
 
     public function product(): BelongsTo

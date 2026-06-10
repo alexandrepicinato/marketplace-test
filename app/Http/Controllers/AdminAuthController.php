@@ -39,6 +39,18 @@ class AdminAuthController extends Controller
         }
 
         $request->session()->regenerate();
+        if (auth()->user()->isBlocked()) {
+            Auth::logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()
+                ->route('admin.login')
+                ->withErrors([
+                    'email' => 'Este usuário está desativado ou suspenso.',
+                ]);
+        }
 
         if (!auth()->user()->is_admin) {
             Auth::logout();

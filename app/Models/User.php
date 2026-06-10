@@ -18,6 +18,10 @@ class User extends Authenticatable
         'cpf',
         'rg',
         'is_admin',
+        'account_status',
+        'suspended_until',
+        'suspension_reason',
+        'disabled_at',
     ];
 
     protected $hidden = [
@@ -27,6 +31,8 @@ class User extends Authenticatable
 
     protected $casts = [
         'is_admin' => 'boolean',
+        'suspended_until' => 'datetime',
+        'disabled_at' => 'datetime',
     ];
 
     public function products(): HasMany
@@ -67,5 +73,27 @@ class User extends Authenticatable
     public function ordersAsSeller(): HasMany
     {
         return $this->hasMany(Order::class, 'seller_user_id');
+    }
+
+    public function affiliateOrders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'affiliate_user_id');
+    }
+
+    public function isBlocked(): bool
+    {
+        if ($this->account_status === 'inactive') {
+            return true;
+        }
+
+        if ($this->account_status === 'suspended') {
+            if (!$this->suspended_until) {
+                return true;
+            }
+
+            return now()->lessThan($this->suspended_until);
+        }
+
+        return false;
     }
 }

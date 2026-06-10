@@ -236,4 +236,112 @@ class AdminController extends Controller
 
         return back()->with('success', 'Configurações atualizadas.');
     }
+    
+    public function updateUserStatus(Request $request, User $user)
+    {
+        $this->ensureAdmin();
+
+        if ($user->id === auth()->id()) {
+            return back()->withErrors([
+                'user' => 'Você não pode alterar o status da própria conta administrativa.',
+            ]);
+        }
+
+        $dados = $request->validate([
+            'account_status' => ['required', 'in:active,inactive,suspended'],
+            'suspended_until' => ['nullable', 'date'],
+            'suspension_reason' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        if ($dados['account_status'] === 'active') {
+            $user->update([
+                'account_status' => 'active',
+                'suspended_until' => null,
+                'suspension_reason' => null,
+                'disabled_at' => null,
+            ]);
+        }
+
+        if ($dados['account_status'] === 'inactive') {
+            $user->update([
+                'account_status' => 'inactive',
+                'suspended_until' => null,
+                'suspension_reason' => $dados['suspension_reason'] ?? 'Conta desativada pelo administrador.',
+                'disabled_at' => now(),
+            ]);
+        }
+
+        if ($dados['account_status'] === 'suspended') {
+            $user->update([
+                'account_status' => 'suspended',
+                'suspended_until' => $dados['suspended_until'] ?? null,
+                'suspension_reason' => $dados['suspension_reason'] ?? 'Conta suspensa pelo administrador.',
+                'disabled_at' => null,
+            ]);
+        }
+
+        return back()->with('success', 'Status do usuário atualizado com sucesso.');
+    }
+
+    public function affiliateEarnings()
+    {
+        $this->ensureAdmin();
+
+        $orders = Order::with([
+            'product',
+            'buyer',
+            'seller',
+            'affiliate',
+            'commissionValidator',
+        ])
+            ->whereNotNull('affiliate_user_id')
+            ->where('commission_amount', '>', 0)
+            ->whereNull('deleted_at')
+            ->latest()
+            ->get();
+
+        $summary = [
+            'pending' => $orders->where('commission_status', 'pending')->sum('commission_amount'),
+            'approved' => $orders->where('commission_status', 'approved')->sum('commission_amount'),
+            'rejected' => $orders->where('commission_status', 'rejected')->sum('commission_amount'),
+            'paid' => $orders->where('commission_status', 'paid')->sum('commission_amount'),
+            'total' => $orders->sum('commission_amount'),
+        ];
+
+        return view('admin.affiliate-earnings', compact('orders', 'summary'));
+    }
+
+    public function updateAffiliateCommission(Request $request, Order $order)
+    {
+        $this->ensureAdmin();
+
+        if (!$order->affiliate_user_id || $order->commission_amount <= 0) {
+            return back()->withErrors([
+                'commission' => 'Este pedido não possui comissão de afiliado.',
+            ]);
+        }
+
+        $dados = $request->validate([
+            'commission_status' => ['required', 'in:pending,approved,rejected,paid'],
+            'commission_notes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $update = [
+            'commission_status' => $dados['commission_status'],
+            'commission_notes' => $dados['commission_notes'] ?? null,
+            'commission_validated_by' => auth()->id(),
+            'commission_validated_at' => now(),
+        ];
+
+        if ($dados['commission_status'] === 'paid') {
+            $update['commission_paid_at'] = now();
+        } else {
+            $update['commission_paid_at'] = null;
+        }
+
+        $order->update($update);
+
+        return back()->with('success', 'Comissão atualizada com sucesso.');
+    }
+
 }
